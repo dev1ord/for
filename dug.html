@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rich Text Editor - Free CKEditor Alternative</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .editor-container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+        
+        .toolbar {
+            background: #2c3e50;
+            padding: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-bottom: 2px solid #34495e;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #34495e;
+        }
+        
+        .toolbar-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+        }
+        
+        .toolbar-btn:hover {
+            background: #4a6583;
+        }
+        
+        .toolbar-btn.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .toolbar-divider {
+            width: 1px;
+            background: #5d6d7e;
+            margin: 0 5px;
+        }
+        
+        .toolbar-select {
+            background: #34495e;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 0 5px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .editor-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            outline: none;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .editor-content:focus {
+            box-shadow: inset 0 0 0 2px #3498db;
+        }
+        
+        .editor-content h1, .editor-content h2, .editor-content h3 {
+            margin: 20px 0 10px;
+        }
+        
+        .editor-content p {
+            margin-bottom: 15px;
+        }
+        
+        .editor-content ul, .editor-content ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .footer {
+            background: #f5f7fa;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e0e6ed;
+        }
+        
+        .word-count {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .action-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            background: #2980b9;
+        }
+        
+        .color-picker {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .color-options {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: white;
+            border-radius: 6px;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: none;
+        }
+        
+        .color-option {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+        
+        .color-picker:hover .color-options {
+            display: grid;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-card ul {
+            margin-left: 20px;
+        }
+        
+        .feature-card li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container {
+                height: 70vh;
+            }
+            
+            .toolbar {
+                gap: 5px;
+            }
+            
+            .toolbar-btn {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Rich Text Editor</h1>
+        <p>A free, open-source alternative to CKEditor with all essential features</p>
+    </div>
+    
+    <div class="editor-container">
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button class="toolbar-btn" data-command="bold" title="Bold"><i class="fas fa-bold"></i></button>
+                <button class="toolbar-btn" data-command="italic" title="Italic"><i class="fas fa-italic"></i></button>
+                <button class="toolbar-btn" data-command="underline" title="Underline"><i class="fas fa-underline"></i></button>
+                <button class="toolbar-btn" data-command="strikeThrough" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-group">
+                <button class="toolbar-btn" data-command="justifyLeft" title="Align Left"><i class="fas fa-align-left"></i></button>
+                <button class="toolbar-btn" data-command="justifyCenter" title="Align Center"><i class="fas fa-align-center"></i></button>
+                <button class="toolbar-btn" data-command="justifyRight" title="Align Right"><i class="fas fa-align-right"></i></button>
+                <button class="toolbar-btn" data-command="justifyFull" title="Justify"><i class="fas fa-align-justify"></i></button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-group">
+                <button class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                <button class="toolbar-btn" data-command="insertOrderedList" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-group">
+                <div class="color-picker">
+                    <button class="toolbar-btn" title="Text Color"><i class="fas fa-font"></i></button>
+                    <div class="color-options">
+                        <div class="color-option" style="background-color: #e74c3c;" data-color="#e74c3c"></div>
+                        <div class="color-option" style="background-color: #3498db;" data-color="#3498db"></div>
+                        <div class="color-option" style="background-color: #2ecc71;" data-color="#2ecc71"></div>
+                        <div class="color-option" style="background-color: #f1c40f;" data-color="#f1c40f"></div>
+                        <div class="color-option" style="background-color: #9b59b6;" data-color="#9b59b6"></div>
+                        <div class="color-option" style="background-color: #1abc9c;" data-color="#1abc9c"></div>
+                        <div class="color-option" style="background-color: #e67e22;" data-color="#e67e22"></div>
+                        <div class="color-option" style="background-color: #34495e;" data-color="#34495e"></div>
+                    </div>
+                </div>
+                <div class="color-picker">
+                    <button class="toolbar-btn" title="Background Color"><i class="fas fa-fill-drip"></i></button>
+                    <div class="color-options">
+                        <div class="color-option" style="background-color: #fadbd8;" data-color="#fadbd8"></div>
+                        <div class="color-option" style="background-color: #d6eaf8;" data-color="#d6eaf8"></div>
+                        <div class="color-option" style="background-color: #d5f5e3;" data-color="#d5f5e3"></div>
+                        <div class="color-option" style="background-color: #fcf3cf;" data-color="#fcf3cf"></div>
+                        <div class="color-option" style="background-color: #e8daef;" data-color="#e8daef"></div>
+                        <div class="color-option" style="background-color: #d1f2eb;" data-color="#d1f2eb"></div>
+                        <div class="color-option" style="background-color: #fdebd0;" data-color="#fdebd0"></div>
+                        <div class="color-option" style="background-color: #e5e7e9;" data-color="#e5e7e9"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-group">
+                <button class="toolbar-btn" data-command="formatBlock" data-value="<h1>" title="Heading 1"><i class="fas fa-heading"></i>1</button>
+                <button class="toolbar-btn" data-command="formatBlock" data-value="<h2>" title="Heading 2"><i class="fas fa-heading"></i>2</button>
+                <button class="toolbar-btn" data-command="formatBlock" data-value="<h3>" title="Heading 3"><i class="fas fa-heading"></i>3</button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-group">
+                <button class="toolbar-btn" data-command="createLink" title="Insert Link"><i class="fas fa-link"></i></button>
+                <button class="toolbar-btn" id="insertImageBtn" title="Insert Image"><i class="fas fa-image"></i></button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-group">
+                <button class="toolbar-btn" data-command="undo" title="Undo"><i class="fas fa-undo"></i></button>
+                <button class="toolbar-btn" data-command="redo" title="Redo"><i class="fas fa-redo"></i></button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <select class="toolbar-select" id="fontFamily">
+                <option value="">Font</option>
+                <option value="Arial">Arial</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+            </select>
+            
+            <select class="toolbar-select" id="fontSize">
+                <option value="">Size</option>
+                <option value="1">Small</option>
+                <option value="3">Normal</option>
+                <option value="5">Large</option>
+                <option value="7">Huge</option>
+            </select>
+        </div>
+        
+        <div class="editor-content" contenteditable="true" id="editor">
+            <h1>Welcome to the Rich Text Editor</h1>
+            <p>This is a <strong>free and open-source</strong> rich text editor that provides similar functionality to CKEditor. It's built with pure JavaScript and CSS.</p>
+            
+            <h2>Features:</h2>
+            <ul>
+                <li>Text formatting: <strong>Bold</strong>, <em>Italic</em>, <u>Underline</u>, <s>Strikethrough</s></li>
+                <li>Paragraph alignment: Left, Center, Right, Justify</li>
+                <li>Lists: Bullet points and Numbered lists</li>
+                <li>Text and background colors</li>
+                <li>Heading styles</li>
+                <li>Insert links and images</li>
+                <li>Undo/Redo functionality</li>
+                <li>Font family and size selection</li>
+            </ul>
+            
+            <h3>Get Started</h3>
+            <p>Start editing this text or replace it with your own content. All the formatting tools are available in the toolbar above.</p>
+            
+            <p>This editor is completely free to use in your projects. Enjoy!</p>
+        </div>
+        
+        <div class="footer">
+            <div class="word-count">Words: <span id="wordCount">0</span> | Characters: <span id="charCount">0</span></div>
+            <button class="action-btn" id="saveBtn"><i class="fas fa-save"></i> Save Document</button>
+        </div>
+    </div>
+    
+    <div class="feature-list">
+        <div class="feature-card">
+            <h3><i class="fas fa-check-circle"></i> Core Features</h3>
+            <ul>
+                <li>All essential formatting tools</li>
+                <li>Lightweight and fast performance</li>
+                <li>No external dependencies</li>
+                <li>Responsive design</li>
+                <li>Easy to integrate</li>
+                <li>Word and character counter</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <h3><i class="fas fa-star"></i> Why Choose This Editor</h3>
+            <ul>
+                <li>Completely free and open-source</li>
+                <li>No hidden costs or subscriptions</li>
+                <li>Modern, clean interface</li>
+                <li>Customizable to fit your needs</li>
+                <li>Works on all modern browsers</li>
+                <li>Regular updates and improvements</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('editor');
+            const toolbarBtns = document.querySelectorAll('.toolbar-btn');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const fontFamily = document.getElementById('fontFamily');
+            const fontSize = document.getElementById('fontSize');
+            const insertImageBtn = document.getElementById('insertImageBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const wordCount = document.getElementById('wordCount');
+            const charCount = document.getElementById('charCount');
+            
+            // Update word and character count
+            function updateCount() {
+                const text = editor.innerText || '';
+                const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+                const chars = text.length;
+                
+                wordCount.textContent = words;
+                charCount.textContent = chars;
+            }
+            
+            // Execute command for toolbar buttons
+            toolbarBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const command = btn.dataset.command;
+                    const value = btn.dataset.value || '';
+                    
+                    if (command === 'createLink') {
+                        const url = prompt('Enter the URL:');
+                        if (url) {
+                            document.execCommand(command, false, url);
+                        }
+                    } else {
+                        document.execCommand(command, false, value);
+                    }
+                    
+                    // Toggle active state for format buttons
+                    if (['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'].includes(command)) {
+                        document.querySelectorAll('.toolbar-btn[data-command^="justify"]').forEach(b => {
+                            b.classList.remove('active');
+                        });
+                        btn.classList.add('active');
+                    }
+                    
+                    editor.focus();
+                });
+            });
+            
+            // Text color
+            document.querySelectorAll('.color-option[data-color]').forEach(option => {
+                option.addEventListener('click', () => {
+                    const color = option.dataset.color;
+                    document.execCommand('foreColor', false, color);
+                    editor.focus();
+                });
+            });
+            
+            // Background color
+            document.querySelectorAll('.color-options ~ .color-options .color-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const color = option.dataset.color;
+                    document.execCommand('hiliteColor', false, color);
+                    editor.focus();
+                });
+            });
+            
+            // Font family
+            fontFamily.addEventListener('change', () => {
+                if (fontFamily.value) {
+                    document.execCommand('fontName', false, fontFamily.value);
+                }
+                editor.focus();
+            });
+            
+            // Font size
+            fontSize.addEventListener('change', () => {
+                if (fontSize.value) {
+                    document.execCommand('fontSize', false, fontSize.value);
+                }
+                editor.focus();
+            });
+            
+            // Insert image
+            insertImageBtn.addEventListener('click', () => {
+                const url = prompt('Enter the image URL:');
+                if (url) {
+                    document.execCommand('insertImage', false, url);
+                }
+                editor.focus();
+            });
+            
+            // Save button
+            saveBtn.addEventListener('click', () => {
+                const content = editor.innerHTML;
+                const blob = new Blob([content], { type: 'text/html' });
+                const a = document.createElement('a');
+                a.download = 'document.html';
+                a.href = URL.createObjectURL(blob);
+                a.click();
+                
+                alert('Document saved successfully!');
+            });
+            
+            // Update counts when content changes
+            editor.addEventListener('input', updateCount);
+            
+            // Initialize counts
+            updateCount();
+            
+            // Set focus to editor
+            editor.focus();
+        });
+    </script>
+</body>
+</html>
